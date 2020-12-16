@@ -1,6 +1,12 @@
 # Blogs
 including Blogs and Demos.
 
+### 项目启动
+
+```
+yarn start
+```
+
 
 ### 博客记录
 
@@ -15,3 +21,4 @@ including Blogs and Demos.
 4）博客园（停止更新）：https://www.cnblogs.com/zourong
 
 5）新浪博客（停止更新）：http://blog.sina.com.cn/u/1925631913
+
