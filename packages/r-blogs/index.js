@@ -10,6 +10,13 @@
 let fs = require('fs');
 let path = require('path');
 
+/**
+ * options
+ *  filePath 文件路径
+ *  fileExtension 文件后缀
+ *  excludeFilePath 排除的文件路径
+ *  theme 主题样式
+ * **/
 class fileLoader {
     constructor(options){
         let { filePath, theme } = options;
@@ -57,30 +64,34 @@ class fileLoader {
      * 根据目录数据生成html内容
     */
    onGetHtmlTemplate(files, theme = 'default'){
-        if(!files || !files.length) return `<div>暂无内容</div>`;
-        let className = `m-blogs-${theme}`;
-        return files.map(file => (`<div class=${className}>
-            ${this.onGetItemTemplate(file)}
-        </div>`));
+       if(!files) return;
+       this.html = '';
+
+       return `<div class="m-blogs-${theme}">
+        <div class="blogs-title">主页${files.name}</div>
+        <div class="blogs-list">
+            ${this.onGetItemTemplate(files.children)}
+        </div>
+       </div>`;
    }
 
    /**
     * 获取模板内容
    */
-  onGetItemTemplate(file){
-      let { path, name, type } = file;
-      if(type == 'directory'){
-        return `<div class="blogs-item">
-        ${name}
-        </div>`
-      }
+  onGetItemTemplate(list = []){
+    list.map(item => {
+        this.html += `<div class="blogs-item">
+                        <a href="${item.path}">${item.name}</a>
+                    </div>`;
+        item.children && item.children.length && this.onGetItemTemplate(item.children);
+    })
+    return this.html;
   }
 }
 
-new fileLoader({
+module.exports = new fileLoader({
     filePath: './',
     fileExtension: ['md', 'html'],
     excludeFilePath: [''],
     theme: 'default'
 })
-
