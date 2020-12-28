@@ -21,7 +21,7 @@ class fileLoader {
     constructor(options){
         let { filePath, theme } = options;
         this.options = options;
-        this.files = this.onGetFiles(filePath);
+        this.files = this.onGetFiles(filePath, 0);
         this.htmlTemplate = this.onGetHtmlTemplate(this.files, theme);
         console.log(this.htmlTemplate);
     }
@@ -29,24 +29,26 @@ class fileLoader {
     /**
      * 根据文件路径生成目录数据
     */
-    onGetFiles(filePath){
+    onGetFiles(filePath, level){
         let { excludeFilePath, fileExtension}  = this.options;
         let data = {
             path: filePath,
             name: path.basename(filePath),
-            type: 'directory'
+            type: 'directory',
+            level
         };
         let files = fs.readdirSync(filePath);
+        level ++; 
         data.children = files.map(file => {
             // 过滤文件
             if(excludeFilePath.includes(file)) return;
             // 获取文件相对路径
             let subPath = path.join(filePath, file);  
             // 读取文件信息对象
-            let stats = fs.statSync(subPath); 
+            let stats = fs.statSync(subPath);
             // 如果是文件夹
             if(stats.isDirectory()){
-                return this.onGetFiles(subPath);
+                return this.onGetFiles(subPath, level);
             }
             // 后缀验证
             let ext = path.extname(file);
@@ -54,7 +56,8 @@ class fileLoader {
             return {
                 path: subPath,
                 name: file,
-                type: 'file'
+                type: 'file',
+                level
             }
         }).filter(i => i);
         return data;
@@ -81,7 +84,7 @@ class fileLoader {
   onGetItemTemplate(list = []){
     list.map(item => {
         this.html += `<div class="blogs-item">
-                        <a href="${item.path}">${item.name}</a>
+                        <a href="${item.path}">目录层级${item.level}-${item.name}</a>
                     </div>`;
         item.children && item.children.length && this.onGetItemTemplate(item.children);
     })
